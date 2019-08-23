@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block title %}Channel: {{ channel_name }}{% endblock %}
+
+{% block under_nav %}
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-4 channel_header">
+            <div class="row py-1">
+                <div class="col offset-1 text-center">
+                    <span class="h5">{{ channel_name }}</span>
+                </div>
+                <div class="col-4 ml-auto text-right">
+                    <a href="{{ url_for('exit') }}"><button class="btn btn-danger btn-sm" id="leave_channel">Back</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div id="message_area"></div>
+
+    <div class="row fixed-bottom justify-content-center">
+        <div class="col-11 col-md-5 bg-dark rounded-top p-3">
+            <form action="/" id="send_message">
+                <div class="row">
+                    <div class="col-2 pl-1 pr-0" id="send_option_div">
+                        <button type="button" class="btn btn-light btn-block message_button" id="send_option" data-messageoption="file"><img src="{{ url_for('static', filename='images/paperclip1.png') }}" style="height: 2rem;" alt=""></button>
+                    </div>
+                    <div class="col" id="send_area">
+                        <textarea class="form-control" name="name" rows="2" cols="80" id="message_text"></textarea>
+                    </div>
+                    <div class="col-2 pl-0">
+                        <button type="button" class="btn btn-primary btn-block message_button" id="submit_button">Send</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function()
+        {
+            document.querySelector("#send_option_div").onclick = function()
+            {
+                if (document.querySelector("#send_option").dataset["messageoption"] == "file")
+                {
+                    document.querySelector("#send_option_div").innerHTML =
+                        `<button type="button" class="btn btn-light btn-block message_button" id="send_option" data-messageoption="text">
+                            <img src="{{ url_for('static', filename='images/envelop.png') }}" style="height: 2rem;" alt="">
+                        </button>`;
+
+                    document.querySelector("#send_area").innerHTML =
+                        `<input class="form-control-file" type="file" id="message_file" style="color:white">`;
+                }
+                else
+                {
+                    document.querySelector("#send_option_div").innerHTML =
+                        `<button type="button" class="btn btn-light btn-block message_button" id="send_option" data-messageoption="file">
+                            <img src="{{ url_for('static', filename='images/paperclip1.png') }}" style="height: 2rem;" alt="">
+                        </button>`;
+
+                    document.querySelector("#send_area").innerHTML =
+                        `<textarea class="form-control" name="name" rows="2" cols="80" id="message_text"></textarea>`;
+                }
+            };
+
+            // Connect to websocket
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+            socket.on("connect", function()
+            {
+                // request message from channel
+                socket.emit("joinchannel", {"channel_name": "{{ channel_name }}"});
+
+                // send text
+                document.querySelector("#submit_button").onclick = function()
+                {
+                    if(document.querySelector("#message_text"))
+                    {
+                        // take input
+                        const message = document.querySelector("#message_text").value;
+                        if (!message)
+                        {
+                            return;
+                        }
+                        console.log(message);
+
+                        // send input
+                        socket.emit("get_message", {"message": message});
+
+                        // clean input field and prevent form submission
+                        document.querySelector("#message_text").value = "";
+                    }
+                    else
+                    {
+                        const file = document.querySelector("#message_file").value;
+                        if (!file)
+                        {
+                            return;
+                        }
+                        console.log(file);
+                        document.querySelector("#message_file").value = "";
+                    }
+                };
+            });
+
+            // display message
+            socket.on("show_message", function(data)
+            {
+                console.log(data);
+                var message_area = document.querySelector("#message_area");
+
+                // empty the display
+                message_area.innerHTML = "";
+
+                // put text in
+                for (let i = 0, l = data.length; i < l; i++)
+                {
+                    message_area.insertAdjacentHTML("beforeend",
+                        `<div class="row px-1 my-2 justify-content-center">
+                            <div class="col-12 col-md-10 border rounded bg-light py-1">
+                                <div class="row">
+                                    <div class="col">
+                                        <span><b>${data[i]["sender"]} (${data[i]["timestamp"]})</b></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <span>${data[i]["message"]}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`);
+                }
+                // scroll to last child
+                if (data.length != 0)
+                {
+                    message_area.lastChild.scrollIntoView();
+                }
+            });
+        });
+    </script>
+{% endblock %}

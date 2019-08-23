@@ -1,0 +1,27 @@
+.change_name_button, .change_name_button:hover {
+  background-color: #235c32;
+  border-color: #235c32; }
+
+.container {
+  margin-top: 10rem; }
+
+.page-header {
+  font-size: 2.5rem; }
+
+.channel_header {
+  background-color: #6a7ccc;
+  color: white;
+  border-radius: 0 0 0.8rem 0.8rem; }
+
+.channel_header_close {
+  background-color: #6a7ccc;
+  color: white;
+  border-radius: 0 0 0.8rem 0.8rem; }
+
+.message_button {
+  margin-top: 10%; }
+
+#message_area {
+  margin-bottom: 10rem; }
+
+/*# sourceMappingURL=styles.css.map */

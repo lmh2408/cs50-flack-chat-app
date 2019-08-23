@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}Flack: Channels{% endblock %}
+
+{% block body %}
+
+    <form action="/" id="create_channel">
+        <div class="row justify-content-center mt-5">
+            <div class="col-8 col-md-4 mb-3">
+                <input type="text" class="form-control" id="new_channel" autocomplete="off">
+            </div>
+            <div class="col-5 col-md-2 text-center mb-3">
+                <button type="submit" class="btn btn-primary btn-block shadow">Create channel</button>
+            </div>
+        </div>
+        <div id="create_error"></div>
+    </form>
+
+    <div class="my-5" id="channel_list"></div>
+
+    <script src="{{ url_for('static', filename='board.js') }}"></script>
+{% endblock %}

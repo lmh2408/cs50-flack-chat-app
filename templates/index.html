@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}Flack{% endblock %}
+
+{% block body %}
+
+    <div class="row mt-5">
+        <div class="col text-center">
+            <p class="display-4 page-header pt-5">Join the discussion</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form action="{{ url_for('register') }}" method="POST" id="get_name">
+                <div class="row justify-content-center">
+                    <div class="col-9 col-md-5 my-4">
+                        <input type="text" class="form-control" name="username" placeholder="Enter your name" id="name" autocomplete="off" required>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-4 col-md-3">
+                        <button type="submit" class="btn btn-primary btn-block">Enter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
